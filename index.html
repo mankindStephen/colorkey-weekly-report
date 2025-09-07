@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>colorkey店铺日流量及销售数据</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin-bottom: 30px;
+        }
+        .data-table-container {
+            overflow-x: auto;
+            margin-top: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            background: white;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        .data-table th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .data-table tr:hover {
+            background-color: #f1f7ff;
+        }
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .data-table td:first-child {
+            font-weight: 600;
+            text-align: left;
+            background-color: #f5f8fa;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            border-radius: 10px;
+            min-width: 180px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+        .summary-item h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .summary-item p {
+            margin: 10px 0 0;
+            font-size: 26px;
+            font-weight: 600;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .chart-container {
+                height: 400px;
+            }
+            .summary-item {
+                min-width: 140px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>colorkey店铺日流量及销售数据</h1>
+            <div class="subtitle">2025年8月20日 - 2025年9月6日</div>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-item">
+                <h3>总访问量</h3>
+                <p>633</p>
+            </div>
+            <div class="summary-item">
+                <h3>总销售量</h3>
+                <p>20</p>
+            </div>
+            <div class="summary-item">
+                <h3>总收入</h3>
+                <p>598</p>
+            </div>
+            <div class="summary-item">
+                <h3>平均转化率</h3>
+                <p>3.16%</p>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+        
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>指标</th>
+                        <th>8/20</th>
+                        <th>8/21</th>
+                        <th>8/22</th>
+                        <th>8/23</th>
+                        <th>8/24</th>
+                        <th>8/25</th>
+                        <th>8/27</th>
+                        <th>8/28</th>
+                        <th>8/29</th>
+                        <th>8/30</th>
+                        <th>8/31</th>
+                        <th>9/1</th>
+                        <th>9/2</th>
+                        <th>9/4</th>
+                        <th>9/5</th>
+                        <th>9/6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Visitors</td>
+                        <td>12</td><td>13</td><td>17</td><td>43</td><td>35</td>
+                        <td>54</td><td>60</td><td>41</td><td>38</td><td>54</td>
+                        <td>37</td><td>37</td><td>45</td><td>44</td><td>45</td><td>58</td>
+                    </tr>
+                    <tr>
+                        <td>Gross Units</td>
+                        <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                        <td>7</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                        <td>0</td><td>2</td><td>2</td><td>4</td><td>3</td><td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Revenue Shipped</td>
+                        <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                        <td>215</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                        <td>0</td><td>58</td><td>62</td><td>116</td><td>87</td><td>60</td>
+                    </tr>
+                    <tr>
+                        <td>Conversion Rate</td>
+                        <td>0%</td><td>0%</td><td>0%</td><td>0%</td><td>0%</td>
+                        <td>12.96%</td><td>0%</td><td>0%</td><td>0%</td><td>0%</td>
+                        <td>0%</td><td>5.41%</td><td>4.44%</td><td>9.09%</td><td>6.67%</td><td>3.45%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>数据更新时间: 2025年9月7日 | 制作: Stephen</p>
+        </div>
+    </div>
+
+    <script>
+        // 准备数据
+        const dates = [
+            '2025-08-20', '2025-08-21', '2025-08-22', '2025-08-23', '2025-08-24',
+            '2025-08-25', '2025-08-27', '2025-08-28', '2025-08-29', '2025-08-30',
+            '2025-08-31', '2025-09-01', '2025-09-02', '2025-09-04', '2025-09-05',
+            '2025-09-06'
+        ];
+        
+        const visitors = [12, 13, 17, 43, 35, 54, 60, 41, 38, 54, 37, 37, 45, 44, 45, 58];
+        const grossUnits = [0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 2, 2, 4, 3, 2];
+        const revenueShipped = [0, 0, 0, 0, 0, 215, 0, 0, 0, 0, 0, 58, 62, 116, 87, 60];
+        
+        // 计算转化率，0值设为null以便断开连线
+        const conversionRate = [];
+        for (let i = 0; i < visitors.length; i++) {
+            if (grossUnits[i] === 0) {
+                conversionRate.push(null);
+            } else {
+                conversionRate.push((grossUnits[i] / visitors[i] * 100).toFixed(2));
+            }
+        }
+
+        // 创建图表
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        // 为折线图创建渐变背景
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(255, 99, 132, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 99, 132, 0.02)');
+        
+        const salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dates.map(date => moment(date).format('MM/DD')),
+                datasets: [
+                    {
+                        label: 'Visitors',
+                        data: visitors,
+                        backgroundColor: 'rgba(54, 162, 235, 0.85)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                        categoryPercentage: 0.7,
+                        barPercentage: 0.5
+                    },
+                    {
+                        label: 'Gross Units',
+                        data: grossUnits,
+                        backgroundColor: 'rgba(255, 159, 64, 0.85)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                        categoryPercentage: 0.7,
+                        barPercentage: 0.5
+                    },
+                    {
+                        label: 'Revenue Shipped',
+                        data: revenueShipped,
+                        backgroundColor: 'rgba(75, 192, 192, 0.85)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y1',
+                        categoryPercentage: 0.7,
+                        barPercentage: 0.5
+                    },
+                    {
+                        label: 'Conversion Rate (%)',
+                        data: conversionRate,
+                        type: 'line',
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2.5,
+                        pointRadius: 3,  // 缩小节点大小
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                        yAxisID: 'y2'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '日期',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            padding: {top: 10, bottom: 10}
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        title: {
+                            display: true,
+                            text: 'Visitors / Gross Units',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Revenue Shipped',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    },
+                    y2: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        offset: true,
+                        suggestedMin: 0,
+                        suggestedMax: 15,
+                        title: {
+                            display: true,
+                            text: 'Conversion Rate (%)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 13
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y;
+                                    if (context.dataset.label === 'Conversion Rate (%)') {
+                                        label += '%';
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
